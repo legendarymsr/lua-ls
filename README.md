@@ -2,6 +2,8 @@
 
 A small `ls` clone written in Lua 5.4 with [luaposix](https://github.com/luaposix/luaposix).
 
+This is a simple clone written for learning and the video guide. It's not meant to compete with GNU coreutils `ls` or BusyBox `ls`, which have far more options and are much more robust.
+
 Supports `-a`, `-l` and `-1`, colors on a terminal, and symlink targets in `-l`.
 
 ## Usage
