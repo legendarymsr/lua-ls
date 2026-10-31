@@ -1,3 +1,5 @@
+![STOP USING ELISP — Lua ls video thumbnail](thumbnail.png)
+
 # lua-ls
 
 A small `ls` clone written in Lua 5.4 with [luaposix](https://github.com/luaposix/luaposix).
