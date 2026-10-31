@@ -1,0 +1,21 @@
+# lua-ls
+
+A small `ls` clone written in Lua 5.4 with [luaposix](https://github.com/luaposix/luaposix).
+
+Supports `-a`, `-l` and `-1`, colors on a terminal, and symlink targets in `-l`.
+
+## Usage
+
+    sudo apt install lua5.4 lua-posix   # or: luarocks install luaposix
+    ./ls.lua [-a] [-l] [-1] [dir]
+    man ./ls.lua.1
+
+`steps/` holds the program at each stage of the video guide.
+
+## Video
+
+The video guide, which writes this in Neovim with lua-language-server and compares it to GNU and BusyBox `ls`, is attached to the release.
+
+## License
+
+GPL-3.0-or-later

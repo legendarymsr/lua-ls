@@ -1,0 +1,28 @@
+.TH LS.LUA 1 "October 2026" "ls.lua 0.1" "User Commands"
+.SH NAME
+ls.lua \- list directory contents, written in Lua
+.SH SYNOPSIS
+.B ls.lua
+[\fB\-a1l\fR] [\fIDIR\fR...]
+.SH DESCRIPTION
+.B ls.lua
+lists the entries of each \fIDIR\fR (default: the current directory),
+sorted by byte value. Names starting with a dot are hidden unless
+\fB\-a\fR is given. On a terminal, directories are blue, symlinks cyan
+and executables green.
+.SH OPTIONS
+.TP
+.B \-a
+Do not hide entries starting with a dot.
+.TP
+.B \-l
+Long format: mode, links, owner, group, size, mtime, name.
+.TP
+.B \-1
+One entry per line.
+.SH EXIT STATUS
+0 on success, 2 if a directory could not be read or an option is invalid.
+.SH SEE ALSO
+.BR ls (1),
+.BR readdir (3),
+.BR stat (2)
