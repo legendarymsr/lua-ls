@@ -14,6 +14,23 @@ Supports `-a`, `-l` and `-1`, colors on a terminal, and symlink targets in `-l`.
     ./ls.lua [-a] [-l] [-1] [dir]
     man ./ls.lua.1
 
+## Install
+
+    ./install.sh                 # PREFIX=$HOME/.local (or /usr/local if root)
+    # PREFIX=/usr/local ./install.sh
+    # DESTDIR=/tmp/stage PREFIX=/usr/local ./install.sh
+
+Installs `ls.lua` to `$PREFIX/bin`, the man page to `$PREFIX/share/man/man1`,
+and — when [tealdeer](https://github.com/tealdeer-rs/tealdeer) is on `PATH` and
+`DESTDIR` is unset — a custom page so `tldr ls.lua` works
+(`~/.local/share/tealdeer/pages/ls.lua.page.md` by default; respects
+`TEALDEER_CONFIG_DIR` and `directories.custom_pages_dir`).
+
+    ./install.sh uninstall
+
+tlrc and the official Python/Node clients have no drop-in custom-pages slot;
+use `tldr --render tldr/ls.lua.md` with those, or install tealdeer.
+
 ## Docs
 
 - Man page: [`ls.lua.1`](ls.lua.1) — full options, colours, exit status, examples (`man ./ls.lua.1`)
