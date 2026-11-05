@@ -1,28 +1,263 @@
-.TH LS.LUA 1 "October 2026" "ls.lua 0.1" "User Commands"
+.TH LS.LUA 1 "November 2026" "ls.lua 0.1" "User Commands"
 .SH NAME
 ls.lua \- list directory contents, written in Lua
 .SH SYNOPSIS
 .B ls.lua
-[\fB\-a1l\fR] [\fIDIR\fR...]
+[\fB\-a1l\fR]
+[\fIDIR\fR...]
 .SH DESCRIPTION
 .B ls.lua
-lists the entries of each \fIDIR\fR (default: the current directory),
-sorted by byte value. Names starting with a dot are hidden unless
-\fB\-a\fR is given. On a terminal, directories are blue, symlinks cyan
-and executables green.
+is a small
+.BR ls (1)
+clone written in Lua 5.4 with
+.BR luaposix .
+It lists the entries of each
+.I DIR
+argument.
+When no
+.I DIR
+is given, the current directory
+.RB ( . )
+is listed.
+.PP
+Entries are sorted by Lua string byte order (locale-independent).
+Names that begin with a dot
+.RB ( . )
+are omitted unless
+.B \-a
+is given.
+.PP
+When standard output is a terminal and
+.B \-l
+is not used, names are printed on a single line separated by two spaces,
+with ANSI colours applied (see
+.BR COLOURS ).
+When standard output is not a terminal, or when
+.B \-1
+is given, one name is printed per line.
+.B \-l
+always prints one entry per line in long format, regardless of whether
+the output is a terminal.
+.PP
+When more than one
+.I DIR
+is given, each directory is introduced with a header line of the form
+.IB DIR :
+and a blank line is inserted before every header after the first.
+.PP
+Options may be clustered after a single leading dash
+(for example
+.BR \-al ).
+There are no long options, and a bare
+.B \-
+is treated as a path, not as an option.
 .SH OPTIONS
 .TP
 .B \-a
-Do not hide entries starting with a dot.
+Do not hide entries whose names begin with a dot.
+This includes
+.B .
+and
+.B ..
+when they are present in the directory listing.
 .TP
 .B \-l
-Long format: mode, links, owner, group, size, mtime, name.
+Use a long listing format.
+Each line shows, in order: the file mode string, the hard-link count,
+the owner name (or numeric UID if the name cannot be resolved), the group
+name (or numeric GID), the size in bytes, the modification time, and the
+name.
+.IP
+The mode string begins with
+.B d
+for a directory,
+.B l
+for a symbolic link, or
+.B \-
+otherwise, followed by the nine
+.BR rwx
+permission bits for user, group and other.
+The modification time is formatted as
+.B %b %e %H:%M
+(month, day-of-month, hour and minute) in the local timezone; the year is
+never shown.
+.IP
+Symbolic links are not followed for type or metadata
+.RB ( lstat (2)
+semantics).
+For a symlink the name is followed by
+.B \->
+and the link target; if the target cannot be read, a question mark
+.RB ( ? )
+is shown instead.
 .TP
 .B \-1
-One entry per line.
+List one entry per line.
+This is the default when standard output is not a terminal.
+Ignored in effect when
+.B \-l
+is also given, because long format already prints one entry per line.
+.SH COLOURS
+Colouring is applied only when standard output is a terminal
+.RB ( isatty (3)
+on file descriptor 1) and a
+.BR lstat (2)
+result is available for the entry.
+Hard-coded ANSI SGR sequences are used; there is no
+.B LS_COLORS
+or other colour configuration.
+.PP
+.TP
+directory
+bold blue
+.RB ( \\e033[1;34m )
+.TP
+symbolic link
+bold cyan
+.RB ( \\e033[1;36m )
+.TP
+executable
+bold green
+.RB ( \\e033[1;32m )
+.TP
+other
+no colour
+.PP
+An entry is treated as executable when any of the user, group or other
+execute bits is set (mode mask octal 0111).
+Colour escapes are reset with
+.B \\e033[0m
+after each coloured name.
+.PP
+When output is not a terminal, names are printed without escape sequences.
+.SH ENVIRONMENT
+.B ls.lua
+does not read any environment variables.
+In particular,
+.BR LS_COLORS ,
+.BR COLUMNS ,
+.B TZ
+and locale variables are ignored for listing, colouring and time display
+(the modification time uses Lua's
+.B os.date
+with the process local timezone).
 .SH EXIT STATUS
-0 on success, 2 if a directory could not be read or an option is invalid.
+.TP
+.B 0
+Every requested directory was listed successfully.
+.TP
+.B 2
+An unknown option character was given, or at least one directory could not
+be opened.
+On an invalid option,
+.B ls.lua
+writes a message of the form
+.IP
+.B ls.lua: invalid option -- '\fIc\fB'
+.IP
+to standard error and exits immediately without listing anything.
+On a directory open failure it writes a diagnostic to standard error,
+continues with any remaining directories, and exits 2 at the end.
+.SH EXAMPLES
+List the current directory with colours (on a terminal):
+.IP
+.B ls.lua
+.PP
+Include hidden entries:
+.IP
+.B ls.lua \-a
+.PP
+Long listing of
+.IR /etc :
+.IP
+.B ls.lua \-l /etc
+.PP
+Combine options; one name per line including hidden files:
+.IP
+.B ls.lua \-a1
+.PP
+List several directories with headers:
+.IP
+.B ls.lua /tmp /var/tmp
+.PP
+Force plain output suitable for scripts (no colours, one per line) by
+redirecting away from a terminal:
+.IP
+.B ls.lua > names.txt
+.SH NOTES
+.B ls.lua
+is intentionally tiny.
+It does not implement recursive listing
+.RB ( \-R ),
+human-readable sizes
+.RB ( \-h ),
+inode numbers
+.RB ( \-i ),
+almost-all
+.RB ( \-A ),
+directory-only
+.RB ( \-d ),
+sorting by time or size, columnised multi-column layout that respects
+terminal width,
+.BR \-\-color ,
+or POSIX
+.B \-\-
+end-of-options.
+Any argument that begins with a dash and has at least one following
+character is parsed as a cluster of short options, so
+.B \-\-help
+and similar long-option spellings are rejected as an invalid option
+character
+.RB ( \- )
+rather than being ignored or treated as paths.
+.PP
+Permission bits for setuid, setgid and sticky are not rendered specially
+in the mode string (the nine
+.BR rwx
+slots are shown as
+.B x
+or
+.B \-
+only).
+File types other than directory and symlink (FIFO, socket, block/char
+device) are shown with a leading
+.B \-
+rather than the usual
+.BR p / s / b / c
+letters.
+.PP
+Owner and group lookups use
+.BR getpwuid (3)
+and
+.BR getgrgid (3);
+if a name cannot be resolved the numeric id is printed instead.
+.SH BUGS
+Multi-column terminal output is a single space-separated line, not a
+width-aware grid like GNU
+.BR ls .
+Very wide directories therefore wrap poorly.
+.PP
+The long-format time never shows a year, so entries older than about six
+months are still printed with month and day only.
+.PP
+A failing
+.BR lstat (2)
+on an individual entry is not reported; the corresponding row may then
+lack colour or long-format fields may error.
 .SH SEE ALSO
 .BR ls (1),
 .BR readdir (3),
-.BR stat (2)
+.BR stat (2),
+.BR lstat (2),
+.BR readlink (2),
+.BR isatty (3)
+.PP
+Project page:
+.UR https://github.com/legendarymsr/lua-ls
+.UE
+.SH AUTHOR
+legendarymsr
+.UR https://github.com/legendarymsr
+.UE
+.SH LICENSE
+GPL-3.0-or-later

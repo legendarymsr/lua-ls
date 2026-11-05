@@ -14,6 +14,11 @@ Supports `-a`, `-l` and `-1`, colors on a terminal, and symlink targets in `-l`.
     ./ls.lua [-a] [-l] [-1] [dir]
     man ./ls.lua.1
 
+## Docs
+
+- Man page: [`ls.lua.1`](ls.lua.1) — full options, colours, exit status, examples (`man ./ls.lua.1`)
+- TLDR: [`tldr/ls.lua.md`](tldr/ls.lua.md) — short examples in [tldr-pages](https://tldr.sh) format
+
 `steps/` holds the program at each stage of the video guide.
 
 ## Video
